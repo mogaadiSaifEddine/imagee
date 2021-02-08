@@ -17,8 +17,28 @@ const storage = multer.diskStorage({
 // init upload 
 const upload = multer({
     storage : storage 
+,fileFilter : function(req,file ,cb){
+    checkfiletype (file, cb)
+
+}
 }).single('imageup')  
 
+//check file type 
+function checkfiletype (file, cb) {
+    //allowed ext 
+    const fileTypes =/jpeg|jpg|png/;
+    // chechk the ext
+    const extName = fileTypes.test(path.extname(file.originalname).toLocaleLowerCase())
+// check mine type
+const mimetype= fileTypes.test(file.mimetype)
+
+if (mimetype && extName){
+    return cb(null,true)
+}
+else{
+   console.log('only images are accepted')
+}
+}
 // init app
 const app =express()
 
@@ -38,7 +58,10 @@ app.post('/upload',(req,res)=>{
       }
       else {
           console.log(req.file)
-          res.send('test ')
+          res.render('app',{
+              msg: 'File uploaded',
+              file : `../public/upload/${req.file.filename}`
+          })
       }  
     })
 })
